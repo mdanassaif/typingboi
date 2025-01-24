@@ -4,14 +4,14 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 const sentences = [
-  "In the heart of the bustling city, where skyscrapers touch the clouds and the streets hum with ceaseless activity, there lies a small park, a sanctuary of tranquility amidst the chaos. Birds chirp melodiously, oblivious to the rush around them, while the leaves rustle softly in the gentle breeze, creating a symphony of nature's own design.",
-  "Technology has transformed every aspect of human life, from communication to transportation, education to healthcare. The rapid pace of innovation challenges us to adapt continuously, learning new skills and embracing change. Yet, amidst this progress, we must not forget the importance of human connection and the values that define our humanity.",
-  "Exploring the depths of the ocean reveals a world as alien and fascinating as outer space. Bioluminescent creatures glide through the inky darkness, their bodies glowing with otherworldly light. Hydrothermal vents spew minerals into the water, supporting ecosystems that thrive in extreme conditions, a testament to life's resilience.",
-  "Literature opens windows to diverse experiences, allowing us to walk in another's shoes, if only for a few pages. Through the power of storytelling, authors capture the complexities of the human condition, weaving tales that inspire, challenge, and provoke thought. Each book is a journey, a dialogue between the reader and the writer across time and space.",
-  "The pursuit of knowledge is a journey without end, a path that winds through the forests of uncertainty and the mountains of discovery. Every question answered leads to new mysteries, driving the relentless engine of scientific inquiry. Curiosity, the spark that ignites innovation, reminds us that the universe is vast and full of wonders yet to be uncovered."
+  "Monkeys type with wild excitement, jumping from key to key like branches in a jungle of letters!",
+  "Bananas fuel the typing monkey's incredible speed and accuracy across the keyboard wilderness!",
+  "In the digital jungle, every keystroke is an adventure, every word a treasure to be conquered!",
+  "Swift fingers dance like playful primates, transforming random letters into meaningful messages!",
+  "The typing monkey laughs in the face of complexity, turning chaos into coherent communication!"
 ];
 
-export default function TypingTest() {
+export default function MonkeyTypingTest() {
   const [playerName, setPlayerName] = useState('');
   const [currentSentence, setCurrentSentence] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -25,23 +25,31 @@ export default function TypingTest() {
   });
   const [startTime, setStartTime] = useState(0);
   const [timeElapsed, setTimeElapsed] = useState(0);
+  const [isFirstKeyPressed, setIsFirstKeyPressed] = useState(false);
 
- const startGame = useCallback(() => {
-  if (!playerName.trim()) return;
-  const sentence = sentences[Math.floor(Math.random() * sentences.length)];
-  setCurrentSentence(sentence);
-  setCurrentIndex(0);
-  setCharacterStatus(Array(sentence.length).fill('pending'));
-  setGameState('playing');
-  setStartTime(Date.now());
-  setTimeElapsed(0);
-  setStats({ wpm: 0, accuracy: 0, correctChars: 0, totalChars: 0 });
-}, [playerName]);
+  const startGame = useCallback(() => {
+    if (!playerName.trim()) return;
+    const sentence = sentences[Math.floor(Math.random() * sentences.length)];
+    setCurrentSentence(sentence);
+    setCurrentIndex(0);
+    setCharacterStatus(Array(sentence.length).fill('pending'));
+    setGameState('playing');
+    setIsFirstKeyPressed(false);
+    setStartTime(0);
+    setTimeElapsed(0);
+    setStats({ wpm: 0, accuracy: 0, correctChars: 0, totalChars: 0 });
+  }, [playerName]);
 
   const handleKeyPress = useCallback((e) => {
     if (gameState !== 'playing') return;
     const expectedChar = currentSentence[currentIndex];
     const typedChar = e.key;
+
+    // Start timer on first correct key press
+    if (!isFirstKeyPressed && typedChar === expectedChar) {
+      setStartTime(Date.now());
+      setIsFirstKeyPressed(true);
+    }
 
     if (typedChar.length > 1) return;
 
@@ -57,8 +65,15 @@ export default function TypingTest() {
       totalChars: prev.totalChars + 1
     }));
 
-    if (typedChar === expectedChar) setCurrentIndex(prev => prev + 1);
-  }, [currentIndex, currentSentence, gameState]);
+    if (typedChar === expectedChar) {
+      setCurrentIndex(prev => prev + 1);
+      
+      // Check if sentence is completed
+      if (currentIndex + 1 === currentSentence.length) {
+        finishGame();
+      }
+    }
+  }, [currentIndex, currentSentence, gameState, isFirstKeyPressed]);
 
   const finishGame = useCallback(async () => {
     const elapsed = (Date.now() - startTime) / 1000;
@@ -81,7 +96,7 @@ export default function TypingTest() {
 
   useEffect(() => {
     let interval;
-    if (gameState === 'playing') {
+    if (gameState === 'playing' && isFirstKeyPressed) {
       interval = setInterval(() => {
         const elapsed = (Date.now() - startTime) / 1000;
         setTimeElapsed(elapsed);
@@ -89,7 +104,7 @@ export default function TypingTest() {
       }, 100);
     }
     return () => clearInterval(interval);
-  }, [gameState, startTime, finishGame]);
+  }, [gameState, startTime, finishGame, isFirstKeyPressed]);
 
   useEffect(() => {
     if (gameState === 'playing') {
@@ -101,46 +116,46 @@ export default function TypingTest() {
   const timeRemaining = Math.max(0, 15 - Math.floor(timeElapsed));
 
   return (
-    <div className="max-h-screen h-[650px]  text-white flex flex-col items-center   justify-center">
+    <div className="max-h-screen h-[768px]  bg-[#2c3e50] text-white flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-4xl text-center">
         {gameState === 'name-input' ? (
           <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2 text-emerald-400">Typing Boi</h1>
-            <p className="text-xl text-gray-400 mb-6">Type as fast as you can.../)</p>
-            <div className="space-y-4">
+            <h1 className="text-4xl font-bold mb-2 text-yellow-400">Typing Boi</h1>
+            <p className="text-xl text-gray-300 mb-6">Type as fast as you can.../)</p>
+            <div className=" flex  justify-center items-center gap-2">
               <input
                 type="text"
-                placeholder="Enter your name"
+                placeholder="Enter your boi name"
                 value={playerName}
                 onChange={(e) => setPlayerName(e.target.value)}
-                className="w-full max-w-xs p-3   bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                className="w-full max-w-xs p-3 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-yellow-400"
                 autoFocus
               />
               <button
                 onClick={startGame}
-                className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-8   transition-all duration-300 transform hover:scale-105"
+                className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 px-8 rounded transition-all "
                 disabled={!playerName.trim()}
               >
-                Start
+                Start!
               </button>
             </div>
           </div>
         ) : gameState === 'playing' ? (
           <div>
             <div className="flex justify-between items-center mb-4 px-4 w-full md:w-3/4 mx-auto">
-              <div className="text-emerald-400">
+              <div className="text-yellow-400">
                 <span className="text-xl font-bold">{timeRemaining}</span>s remaining
               </div>
-              <div className="text-blue-400">
+              <div className="text-green-400">
                 Words: <span className="text-xl font-bold">{Math.floor(stats.correctChars / 5)}</span>
               </div>
             </div>
-            <div className="text-2xl mb-8 leading-relaxed font-mono bg-gray-800 p-6  w-full md:w-3/4 mx-auto">
+            <div className="text-2xl mb-8 leading-relaxed font-mono bg-gray-800 p-6 rounded w-full md:w-3/4 mx-auto">
               {currentSentence.split('').map((char, index) => (
                 <span
                   key={index}
                   className={`
-                    ${characterStatus[index] === 'correct' ? 'text-emerald-400' : 
+                    ${characterStatus[index] === 'correct' ? 'text-green-400' : 
                      characterStatus[index] === 'incorrect' ? 'text-red-500 underline' : 
                      'text-gray-400'}
                     ${index === currentIndex ? 'border-b-2 border-yellow-400' : ''}
@@ -150,30 +165,29 @@ export default function TypingTest() {
                 </span>
               ))}
             </div>
-            
           </div>
         ) : (
           <div className="mt-8">
-            <h2 className="text-3xl font-bold mb-4 text-emerald-400">Test Results</h2>
+            <h2 className="text-3xl font-bold mb-4 text-yellow-400">Current Result </h2>
             <div className="grid grid-cols-2 gap-4 mb-8">
-              <div className="bg-gray-800 p-6 ">
+              <div className="bg-gray-800 p-6 rounded">
                 <p className="text-xl mb-2">WPM</p>
-                <p className="text-4xl font-bold text-emerald-400">{stats.wpm}</p>
+                <p className="text-4xl font-bold text-green-400">{stats.wpm}</p>
               </div>
-              <div className="bg-gray-800 p-6 ">
+              <div className="bg-gray-800 p-6 rounded">
                 <p className="text-xl mb-2">Accuracy</p>
-                <p className="text-4xl font-bold text-blue-400">{stats.accuracy}%</p>
+                <p className="text-4xl font-bold text-yellow-400">{stats.accuracy}%</p>
               </div>
             </div>
             <div className="flex justify-center space-x-4">
               <button
                 onClick={() => setGameState('name-input')}
-                className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-6  transition duration-300"
+                className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 px-6 rounded transition duration-300"
               >
                 Play Again
               </button>
-              <Link href="/pro" className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6  transition duration-300">
-                View Leaderboard
+              <Link href="/pro" className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded transition duration-300">
+                Leaderboard
               </Link>
             </div>
           </div>
