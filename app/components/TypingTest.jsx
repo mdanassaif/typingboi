@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import MobileKeyboard from './MobileKeyboard';
 
 const sentences = [
   "Monkeys type with wild excitement, jumping from key to key like branches in a jungle of letters!",
@@ -116,13 +117,13 @@ export default function MonkeyTypingTest() {
   const timeRemaining = Math.max(0, 15 - Math.floor(timeElapsed));
 
   return (
-    <div className="max-h-screen h-[768px]  bg-[#2c3e50] text-white flex flex-col items-center justify-center p-4">
+    <div className="max-h-screen h-screen bg-[#2c3e50] text-white flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-4xl text-center">
         {gameState === 'name-input' ? (
           <div className="mb-8">
             <h1 className="text-4xl font-bold mb-2 text-yellow-400">Typing Boi</h1>
             <p className="text-xl text-gray-300 mb-6">Type as fast as you can.../)</p>
-            <div className=" flex  justify-center items-center gap-2">
+            <div className="flex justify-center items-center gap-2">
               <input
                 type="text"
                 placeholder="Enter your boi name"
@@ -141,7 +142,7 @@ export default function MonkeyTypingTest() {
             </div>
           </div>
         ) : gameState === 'playing' ? (
-          <div>
+          <div className="flex flex-col h-full">
             <div className="flex justify-between items-center mb-4 px-4 w-full md:w-3/4 mx-auto">
               <div className="text-yellow-400">
                 <span className="text-xl font-bold">{timeRemaining}</span>s remaining
@@ -150,7 +151,7 @@ export default function MonkeyTypingTest() {
                 Words: <span className="text-xl font-bold">{Math.floor(stats.correctChars / 5)}</span>
               </div>
             </div>
-            <div className="text-2xl mb-8 leading-relaxed font-mono bg-gray-800 p-6 rounded w-full md:w-3/4 mx-auto">
+            <div className="text-xl md:text-2xl mb-4 leading-relaxed font-mono bg-gray-800 p-4 rounded w-full md:w-3/4 mx-auto flex-grow overflow-auto">
               {currentSentence.split('').map((char, index) => (
                 <span
                   key={index}
@@ -165,6 +166,7 @@ export default function MonkeyTypingTest() {
                 </span>
               ))}
             </div>
+            <MobileKeyboard />
           </div>
         ) : (
           <div className="mt-8">
