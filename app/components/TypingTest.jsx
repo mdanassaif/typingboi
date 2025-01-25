@@ -9,15 +9,15 @@ import {
 } from "@heroicons/react/24/outline";
 
 const sentences = [
-  "In the intricate cybernetic ecosystem of computational evolution, algorithmic mastery emerges not through sporadic intellectual bursts but through meticulously cultivated deliberate practice patterns that transform nascent programmers into symphonic code architects, bridging conceptual chasms with methodical precision and unwavering dedication.",
+  "In the world of coding, skill grows not from random moments but from steady and focused work that turns new programmers into masters who link ideas with clear steps, using their time and energy wisely to solve hard problems and build systems that stand the test of time.",
 
-  "Within the labyrinthine neural networks of technological prowess, typing velocity transcends mere mechanical input, metamorphosing into a profound metric of computational thinking proficiency—where each keystroke represents a quantum leap of cognitive translation, mapping abstract algorithmic landscapes into tangible digital manifestations.",
+  "In the deep systems of tech, typing speed is more than just input; it becomes a sign of clear and strong thought where each press turns complex and abstract ideas into real results, bridging the gap between imagination and working code that shapes the digital world.",
 
-  "Syntactical precision operates as the quantum entanglement of development workflow efficiency, where each meticulously crafted line of code becomes a linguistic algorithm transforming chaotic potential into structured elegance, accelerating technological paradigms through microscopic grammatical interventions.",
+  "Clear and simple code is like the glue of smooth and productive work where every small and careful line changes messy and scattered ideas into neat and organized ones, speeding up progress with fixes that are smart, quick, and precise, creating tools that make life easier.",
 
-  "Keyboard fluency manifests as a sophisticated cognitive bandwidth allocation mechanism, where fingers dance across electromagnetic terrains, translating neurological impulses into digital symphonies that expand human computational consciousness beyond traditional perceptual boundaries.",
+  "Typing well is like a skill where hands move fast and true, turning thoughts into code that pushes what humans can do with tech even further, allowing ideas to flow freely and opening the door to new possibilities that were once beyond reach.",
 
-  "Repetitive motion optimization emerges as a nuanced ergonomic philosophy, strategically reducing developer fatigue factors by transforming mechanical interactions into biomechanical poetry—where technological interface becomes an extension of human neurological potential, minimizing physical entropy and maximizing creative output.",
+  "Good habits in typing cut down strain by making work smooth and easy while turning tough and tiring tasks into simple and clear flows, letting people create more, stay focused, and work longer without feeling the heavy toll of fatigue and stress.",
 ];
 
 export default function ProfessionalTypingLab() {
@@ -25,21 +25,22 @@ export default function ProfessionalTypingLab() {
   const [sentence, setSentence] = useState("");
   const [stats, setStats] = useState({ wpm: 0, accuracy: 100, time: 30 });
   const [gameState, setGameState] = useState("playing");
+  const [isMobile, setIsMobile] = useState(false);
   const inputRef = useRef(null);
   const timerRef = useRef(null);
-  const [showVirtual, setShowVirtual] = useState(false);
   const startTimeRef = useRef(null);
   const timerStartedRef = useRef(false);
 
   useEffect(() => {
-    startGame();
-  }, []);
+    const checkMobile = () => {
+      setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+    };
 
-  useEffect(() => {
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    setShowVirtual(isMobile);
-    isMobile && inputRef.current?.focus();
-  }, [gameState]);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    startGame();
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   const generateSentence = useCallback(() => {
     const crypto = window.crypto || window.msCrypto;
@@ -125,32 +126,41 @@ export default function ProfessionalTypingLab() {
       <div className="max-w-4xl mx-auto px-4 py-8">
         {gameState === "playing" && (
           <div className="space-y-8 animate-fade-in">
-            <div className="grid grid-cols-3 gap-3 sm:gap-4 text-slate-600">
-              <MetricCard
-                icon={
-                  <ClockIcon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
-                }
-                value={stats.time}
-                label="Seconds"
-              />
-              <MetricCard
-                icon={
-                  <BoltIcon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
-                }
-                value={stats.wpm}
-                label="Words/Min"
-              />
-              <MetricCard
-                icon={
-                  <ChartBarIcon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
-                }
-                value={stats.accuracy}
-                label="Accuracy"
-                unit="%"
-              />
-            </div>
+            {!isMobile && (
+              <div className="grid grid-cols-3 gap-3 sm:gap-4 text-slate-600">
+                <MetricCard
+                  icon={
+                    <ClockIcon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
+                  }
+                  value={stats.time}
+                  label="Seconds"
+                />
+                <MetricCard
+                  icon={
+                    <BoltIcon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
+                  }
+                  value={stats.wpm}
+                  label="Words/Min"
+                />
+                <MetricCard
+                  icon={
+                    <ChartBarIcon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
+                  }
+                  value={stats.accuracy}
+                  label="Accuracy"
+                  unit="%"
+                />
+              </div>
+            )}
 
-            <div className="sm:text-xl md:text-xl lg:text-2xl xl:text-3xl leading-relaxed text-center font-mono text-slate-800 p-6 bg-white rounded-xl shadow-sm border border-slate-200">
+            <div
+              className={`
+                sm:text-xl md:text-xl lg:text-2xl xl:text-3xl 
+                leading-relaxed text-center font-mono text-slate-800 
+                p-6 bg-white rounded-xl shadow-sm border border-slate-200 
+                ${isMobile ? "h-[50vh] overflow-auto" : ""}
+              `}
+            >
               {sentence.split("").map((char, index) => {
                 const inputChar = input[index];
                 return (
@@ -210,18 +220,18 @@ export default function ProfessionalTypingLab() {
             </div>
             <div className="flex gap-4 justify-center">
               <ActionButton
-                onClick={() => {}}
+                onClick={startGame}
                 icon={<HomeModernIcon className="w-5 h-5" />}
                 variant="secondary"
               >
-                <Link href="/pro">Leaderboard</Link>
+                Restart
               </ActionButton>
             </div>
           </div>
         )}
       </div>
 
-      {showVirtual && gameState === "playing" && (
+      {isMobile && gameState === "playing" && (
         <MobileKeyboard
           onKeyPress={handleVirtualInput}
           currentSentence={sentence}
@@ -237,51 +247,42 @@ const MobileKeyboard = ({ onKeyPress, currentSentence, currentIndex }) => {
     ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
     ["a", "s", "d", "f", "g", "h", "j", "k", "l"],
     ["z", "x", "c", "v", "b", "n", "m"],
-    [" "],
   ];
 
-  const MobileKeyboard = ({ onKeyPress }) => {
-    const rows = [
-      ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
-      ["a", "s", "d", "f", "g", "h", "j", "k", "l"],
-      ["z", "x", "c", "v", "b", "n", "m"],
-    ];
-
-    return (
-      <div className="fixed inset-x-0 bottom-0 bg-white border-t border-slate-200 shadow-xl pt-2 pb-[env(safe-area-inset-bottom)] px-1">
-        <div className="max-w-lg mx-auto">
-          {rows.map((row, i) => (
-            <div key={i} className="flex justify-center gap-1 mb-1 px-1">
-              {row.map((key) => (
-                <button
-                  key={key}
-                  onClick={() => onKeyPress(key)}
-                  className="flex-1 h-12 min-w-[9%] bg-slate-100 text-slate-600 text-sm rounded-sm active:scale-95 transition-transform font-medium"
-                >
-                  {key}
-                </button>
-              ))}
-            </div>
-          ))}
-
-          <div className="flex gap-1 px-1 mt-2">
-            <button
-              onClick={() => onKeyPress(" ")}
-              className="flex-[2] h-12 bg-slate-100 text-slate-600 text-sm rounded-sm active:scale-95 transition-transform"
-            >
-              Space
-            </button>
-            <button
-              onClick={() => onKeyPress("⌫")}
-              className="flex-1 h-12 bg-rose-100 text-rose-600 text-sm rounded-sm active:scale-95 transition-transform"
-            >
-              ⌫
-            </button>
+  return (
+    <div className="fixed inset-x-0 bottom-0 bg-white border-t border-slate-200 shadow-xl pt-2 pb-[env(safe-area-inset-bottom)] px-1 h-[50vh]">
+      <div className="max-w-lg mx-auto">
+        {rows.map((row, i) => (
+          <div key={i} className="flex justify-center gap-1 mb-1 px-1">
+            {row.map((key) => (
+              <button
+                key={key}
+                onClick={() => onKeyPress(key)}
+                className="flex-1 h-12 min-w-[9%] bg-slate-100 text-slate-600 text-sm rounded-sm active:scale-95 transition-transform font-medium"
+              >
+                {key}
+              </button>
+            ))}
           </div>
+        ))}
+
+        <div className="flex gap-1 px-1 mt-2">
+          <button
+            onClick={() => onKeyPress(" ")}
+            className="flex-[2] h-12 bg-slate-100 text-slate-600 text-sm rounded-sm active:scale-95 transition-transform"
+          >
+            Space
+          </button>
+          <button
+            onClick={() => onKeyPress("⌫")}
+            className="flex-1 h-12 bg-rose-100 text-rose-600 text-sm rounded-sm active:scale-95 transition-transform"
+          >
+            ⌫
+          </button>
         </div>
       </div>
-    );
-  };
+    </div>
+  );
 };
 
 const MetricCard = ({ icon, value, label, unit = "" }) => (
