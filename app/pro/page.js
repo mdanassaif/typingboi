@@ -1,11 +1,14 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { BoltIcon, ChartBarIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 
 export default function MonkeyRankers() {
   const [topScores, setTopScores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+ 
 
   const fetchScores = async () => {
     try {
@@ -40,77 +43,114 @@ export default function MonkeyRankers() {
     }
   };
 
+  const getRankColor = (index) => {
+    switch(index) {
+      case 0: return 'text-blue-500';
+      case 1: return 'text-emerald-500';
+      case 2: return 'text-amber-500';
+      case 3: return 'text-rose-500';
+      case 4: return 'text-slate-500';
+      default: return 'text-slate-400';
+    }
+  };
+
   return (
-    <div className="max-h-screen h-[768px] bg-[#2c3e50] p-4 mx-auto text-white">
-      <h1 className="text-2xl md:text-3xl font-bold text-center mb-8 text-yellow-400">
-        Top Monkey Rankers
-      </h1>
+    <div className="min-h-screen bg-slate-50 font-geist p-8">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-3xl font-semibold text-slate-800 mb-8 text-center">
+          TypingBoi Leaderboard
+        </h1>
 
-      {loading ? (
-        <div className="text-center text-lg text-gray-400">Climbing leaderboard...</div>
-      ) : error ? (
-        <div className="text-center text-red-400">
-          <p>{error}</p>
-          <button 
-            onClick={fetchScores}
-            className="mt-4 bg-yellow-500 text-black px-4 py-2 rounded"
-          >
-            Retry
-          </button>
-        </div>
-      ) : topScores.length === 0 ? (
-        <div className="text-center text-gray-400">
-          No boi points yet. Be the first monkey!
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {/* Desktop View */}
-          <div className="hidden md:grid grid-cols-5 gap-4 font-bold bg-gray-800 p-4 rounded-t">
-            <div>Rank</div>
-            <div>Monkey Name</div>
-            <div>WPM</div>
-            <div>Accuracy</div>
-            <div>Achievement</div>
+        {loading ? (
+          <div className="text-center text-slate-500 p-8">
+            <ArrowPathIcon className="w-8 h-8 animate-spin mx-auto mb-4 text-slate-400" />
+            Loading ranking data...
           </div>
-          
-          {topScores.map((score, index) => (
-            <div key={score._id}>
-              {/* Desktop Layout */}
-              <div className="hidden md:grid grid-cols-5 gap-4 bg-gray-700 p-4 rounded hover:bg-gray-800 transition">
-                <div>#{index + 1}</div>
-                <div>{score.name}</div>
-                <div className="text-green-400">{score.wpm}</div>
-                <div className="text-yellow-400">{score.accuracy}%</div>
-                <div className="text-sm font-semibold">{getRankTag(index)}</div>
+        ) : error ? (
+          <div className="text-center p-8">
+            <div className="text-rose-500 mb-4">{error}</div>
+            <button 
+              onClick={fetchScores}
+              className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg"
+            >
+              Retry
+            </button>
+          </div>
+        ) : topScores.length === 0 ? (
+          <div className="text-center text-slate-500 p-8">
+            No records yet. Be the first!
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {/* Desktop Table */}
+            <div className="hidden md:block bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+              <div className="grid grid-cols-12 gap-4 text-slate-600 font-medium mb-4">
+                <div className="col-span-1">Rank</div>
+                <div className="col-span-4">Name</div>
+                <div className="col-span-2">WPM</div>
+                <div className="col-span-3">Accuracy</div>
+                <div className="col-span-2">Level</div>
               </div>
-
-              {/* Mobile Layout */}
-              <div className="md:hidden bg-gray-700 p-4 rounded mb-2 hover:bg-gray-800 transition">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="font-bold text-lg">#{index + 1} {score.name}</span>
-                  <span className="text-sm font-semibold">{getRankTag(index)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <div>
-                    <span className="text-green-400">WPM: {score.wpm}</span>
+              
+              {topScores.map((score, index) => (
+                <div key={score._id} className="grid grid-cols-12 gap-4 items-center py-3 border-t border-slate-100">
+                  <div className="col-span-1 font-mono">#{index + 1}</div>
+                  <div className="col-span-4 text-slate-800">{score.name}</div>
+                  <div className="col-span-2">
+                    <div className="flex items-center gap-2 text-blue-500">
+                      <BoltIcon className="w-5 h-5" />
+                      {score.wpm}
+                    </div>
                   </div>
-                  <div>
-                    <span className="text-yellow-400">Accuracy: {score.accuracy}%</span>
+                  <div className="col-span-3">
+                    <div className="flex items-center gap-2">
+                      <ChartBarIcon className="w-5 h-5 text-emerald-500" />
+                      {score.accuracy}%
+                    </div>
+                  </div>
+                  <div className={`col-span-2 ${getRankColor(index)} font-medium`}>
+                    {getRankTag(index)}
                   </div>
                 </div>
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
-      )}
 
-      <div className="mt-8 text-center">
-        <Link
-          href="/"
-          className="inline-block bg-yellow-500 hover:bg-yellow-600 text-black px-6 py-2 rounded"
-        >
-          Take Typing Test
-        </Link>
+            {/* Mobile View */}
+            <div className="md:hidden space-y-4">
+              {topScores.map((score, index) => (
+                <div key={score._id} className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="font-semibold text-slate-800">#{index + 1}</span>
+                    <span className={`text-sm ${getRankColor(index)}`}>
+                      {getRankTag(index)}
+                    </span>
+                  </div>
+                  <div className="text-lg font-medium text-slate-800 mb-2">{score.name}</div>
+                  <div className="flex justify-between">
+                    <div className="flex items-center gap-2 text-blue-500">
+                      <BoltIcon className="w-5 h-5" />
+                      {score.wpm} WPM
+                    </div>
+                    <div className="flex items-center gap-2 text-emerald-500">
+                      <ChartBarIcon className="w-5 h-5" />
+                      {score.accuracy}%
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="mt-8 text-center">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg"
+          >
+            <ArrowPathIcon className="w-5 h-5" />
+            New Typing Session
+          </Link>
+        </div>
       </div>
     </div>
   );

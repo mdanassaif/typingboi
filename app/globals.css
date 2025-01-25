@@ -2,12 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
-/* globals.css */
-.current-char {
-  border-color: #f59e0b !important;
-  animation: blink 1s step-end infinite;
-}
+@layer utilities {
+  .font-geist {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  .shadow-xs {
+    box-shadow: 0 1px 2px rgba(0,0,0,0.025);
+  }
 
-@keyframes blink {
-  50% { border-color: transparent; }
+  .animate-fade-in {
+    animation: fadeIn 0.2s ease-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.25s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
 }
