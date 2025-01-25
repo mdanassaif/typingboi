@@ -1,11 +1,12 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { BoltIcon, ChartBarIcon, ArrowPathIcon, SpeakerWaveIcon, SpeakerXMarkIcon } from '@heroicons/react/24/outline';
+import { RocketLaunchIcon, ChartBarIcon, SpeakerWaveIcon, SpeakerXMarkIcon,  } from '@heroicons/react/24/outline';
 
 const musicTracks = [
   "/song1.mp3",
   "/song2.mp3",
+  "/song3.mp3",
 ];
 
 
@@ -20,12 +21,21 @@ export default function NavBar() {
   const progressRef = useRef(null);
 
   const togglePlayback = () => {
-    if (audioState.isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play();
+    if (!audioRef.current) return;
+  
+    // Mobile browsers require user interaction for audio
+    if (typeof audioRef.current.play === 'function') {
+      if (audioState.isPlaying) {
+        audioRef.current.pause();
+      } else {
+        // Reset audio for mobile compatibility
+        audioRef.current.currentTime = 0;
+        audioRef.current.play().catch((error) => {
+          console.log('Audio play failed:', error);
+        });
+      }
+      setAudioState(prev => ({ ...prev, isPlaying: !prev.isPlaying }));
     }
-    setAudioState(prev => ({ ...prev, isPlaying: !prev.isPlaying }));
   };
 
   const handleVolume = (e) => {
@@ -63,7 +73,7 @@ export default function NavBar() {
     <nav className="sticky top-0 z-50 bg-slate-800/90 backdrop-blur-sm flex justify-between items-center p-4 shadow-xl">
       <Link href="/" className="flex items-center space-x-3 group">
         <div className="p-2 bg-slate-700 rounded-lg group-hover:bg-emerald-500 transition-all">
-          <BoltIcon className="w-6 h-6 text-emerald-400 group-hover:text-white" />
+          <RocketLaunchIcon className="w-6 h-6 text-emerald-400 group-hover:text-white" />
         </div>
         <span className="text-xl font-bold text-slate-200 group-hover:text-emerald-400 transition-colors">
         TypingBoi
@@ -77,19 +87,20 @@ export default function NavBar() {
         </Link>
 
         <div className="flex items-center space-x-4 pl-4 border-l border-slate-600">
-          <div className="relative group">
-            <button
-              onClick={togglePlayback}
-              className="p-2 rounded-lg bg-slate-700 hover:bg-emerald-500 transition-all"
-            >
-              {audioState.isPlaying ? (
-                <SpeakerWaveIcon className="w-6 h-6 text-emerald-400 group-hover:text-white" />
-              ) : (
-                <SpeakerXMarkIcon className="w-6 h-6 text-slate-400 group-hover:text-white" />
-              )}
-            </button>
+        <div className="relative group">
+  <button
+    onClick={togglePlayback}
+    className="p-2 rounded-lg bg-slate-700 hover:bg-emerald-500 transition-all"
+    aria-label={audioState.isPlaying ? "Pause music" : "Play music"}
+  >
+    {audioState.isPlaying ? (
+      <SpeakerWaveIcon className="w-5 h-5 text-emerald-400 group-hover:text-white" />
+    ) : (
+      <SpeakerXMarkIcon className="w-5 h-5 text-slate-400 group-hover:text-white" />
+    )}
+  </button>
 
-            <div className="absolute right-0 bottom-14 bg-slate-700 p-4 rounded-xl shadow-2xl w-64 opacity-0 group-hover:opacity-100 transition-opacity">
+  <div className="hidden md:block absolute right-0 bottom-14 bg-slate-700 p-4 rounded-xl shadow-2xl w-64 opacity-0 group-hover:opacity-100 transition-opacity">
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
                   <input
