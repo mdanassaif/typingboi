@@ -1,25 +1,30 @@
-'use client';
-import { useState, useEffect, useCallback, useRef } from 'react';
-import Link from 'next/link';
-import { ClockIcon, BoltIcon, ChartBarIcon, HomeModernIcon } from '@heroicons/react/24/outline';
+"use client";
+import { useState, useEffect, useCallback, useRef } from "react";
+import Link from "next/link";
+import {
+  ClockIcon,
+  BoltIcon,
+  ChartBarIcon,
+  HomeModernIcon,
+} from "@heroicons/react/24/outline";
 
 const sentences = [
   "In the intricate cybernetic ecosystem of computational evolution, algorithmic mastery emerges not through sporadic intellectual bursts but through meticulously cultivated deliberate practice patterns that transform nascent programmers into symphonic code architects, bridging conceptual chasms with methodical precision and unwavering dedication.",
-  
+
   "Within the labyrinthine neural networks of technological prowess, typing velocity transcends mere mechanical input, metamorphosing into a profound metric of computational thinking proficiency—where each keystroke represents a quantum leap of cognitive translation, mapping abstract algorithmic landscapes into tangible digital manifestations.",
-  
+
   "Syntactical precision operates as the quantum entanglement of development workflow efficiency, where each meticulously crafted line of code becomes a linguistic algorithm transforming chaotic potential into structured elegance, accelerating technological paradigms through microscopic grammatical interventions.",
-  
+
   "Keyboard fluency manifests as a sophisticated cognitive bandwidth allocation mechanism, where fingers dance across electromagnetic terrains, translating neurological impulses into digital symphonies that expand human computational consciousness beyond traditional perceptual boundaries.",
-  
-  "Repetitive motion optimization emerges as a nuanced ergonomic philosophy, strategically reducing developer fatigue factors by transforming mechanical interactions into biomechanical poetry—where technological interface becomes an extension of human neurological potential, minimizing physical entropy and maximizing creative output."
+
+  "Repetitive motion optimization emerges as a nuanced ergonomic philosophy, strategically reducing developer fatigue factors by transforming mechanical interactions into biomechanical poetry—where technological interface becomes an extension of human neurological potential, minimizing physical entropy and maximizing creative output.",
 ];
 
 export default function ProfessionalTypingLab() {
-  const [input, setInput] = useState('');
-  const [sentence, setSentence] = useState('');
+  const [input, setInput] = useState("");
+  const [sentence, setSentence] = useState("");
   const [stats, setStats] = useState({ wpm: 0, accuracy: 100, time: 30 });
-  const [gameState, setGameState] = useState('playing');
+  const [gameState, setGameState] = useState("playing");
   const inputRef = useRef(null);
   const timerRef = useRef(null);
   const [showVirtual, setShowVirtual] = useState(false);
@@ -46,8 +51,8 @@ export default function ProfessionalTypingLab() {
   const startGame = useCallback(() => {
     const newSentence = generateSentence();
     setSentence(newSentence);
-    setInput('');
-    setGameState('playing');
+    setInput("");
+    setGameState("playing");
     setStats({ wpm: 0, accuracy: 100, time: 30 });
     timerStartedRef.current = false;
     startTimeRef.current = null;
@@ -56,16 +61,16 @@ export default function ProfessionalTypingLab() {
 
   const endGame = useCallback(() => {
     clearInterval(timerRef.current);
-    setGameState('results');
+    setGameState("results");
   }, []);
 
   const startTimer = useCallback(() => {
     if (!timerStartedRef.current) {
       timerStartedRef.current = true;
       startTimeRef.current = Date.now();
-      
+
       timerRef.current = setInterval(() => {
-        setStats(prev => {
+        setStats((prev) => {
           if (prev.time <= 1) {
             endGame();
             return { ...prev, time: 0 };
@@ -76,64 +81,94 @@ export default function ProfessionalTypingLab() {
     }
   }, [endGame]);
 
-  const processInput = useCallback((newInput) => {
-    if (!timerStartedRef.current && newInput.length > 0) {
-      startTimer();
-    }
+  const processInput = useCallback(
+    (newInput) => {
+      if (!timerStartedRef.current && newInput.length > 0) {
+        startTimer();
+      }
 
-    setInput(newInput);
+      setInput(newInput);
 
-    const correctChars = [...newInput].filter((c, i) => c === sentence[i]).length;
-    const accuracy = Math.round((correctChars / (newInput.length || 1)) * 100);
+      const correctChars = [...newInput].filter(
+        (c, i) => c === sentence[i]
+      ).length;
+      const accuracy = Math.round(
+        (correctChars / (newInput.length || 1)) * 100
+      );
 
-    if (timerStartedRef.current) {
-      const timeElapsed = (Date.now() - startTimeRef.current) / 1000;
-      const wpm = Math.round((correctChars / 5) / (timeElapsed / 60)) || 0;
-      setStats(prev => ({ ...prev, accuracy, wpm }));
-    }
+      if (timerStartedRef.current) {
+        const timeElapsed = (Date.now() - startTimeRef.current) / 1000;
+        const wpm = Math.round(correctChars / 5 / (timeElapsed / 60)) || 0;
+        setStats((prev) => ({ ...prev, accuracy, wpm }));
+      }
 
-    if (newInput === sentence) endGame();
-  }, [sentence, endGame, startTimer]);
+      if (newInput === sentence) endGame();
+    },
+    [sentence, endGame, startTimer]
+  );
 
   const handlePhysicalInput = (e) => {
-    if (gameState !== 'playing') return;
+    if (gameState !== "playing") return;
     processInput(e.target.value);
   };
 
   const handleVirtualInput = (key) => {
-    if (gameState !== 'playing') return;
-    
-    const newInput = key === '⌫' 
-      ? input.slice(0, -1) 
-      : input + key;
+    if (gameState !== "playing") return;
+
+    const newInput = key === "⌫" ? input.slice(0, -1) : input + key;
 
     processInput(newInput);
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 font-geist">
+    <div className="min-h-screen bg-slate-50 font-geist relative pb-[300px]">
       <div className="max-w-4xl mx-auto px-4 py-8">
-        {gameState === 'playing' && (
+        {gameState === "playing" && (
           <div className="space-y-8 animate-fade-in">
-            <div className="grid grid-cols-3 gap-4 text-slate-600">
-              <MetricCard icon={<ClockIcon className="w-6 h-6" />} value={stats.time} label="Seconds" />
-              <MetricCard icon={<BoltIcon className="w-6 h-6" />} value={stats.wpm} label="Words/Min" />
-              <MetricCard icon={<ChartBarIcon className="w-6 h-6" />} value={stats.accuracy} label="Accuracy" unit="%" />
+            <div className="grid grid-cols-3 gap-3 sm:gap-4 text-slate-600">
+              <MetricCard
+                icon={
+                  <ClockIcon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
+                }
+                value={stats.time}
+                label="Seconds"
+              />
+              <MetricCard
+                icon={
+                  <BoltIcon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
+                }
+                value={stats.wpm}
+                label="Words/Min"
+              />
+              <MetricCard
+                icon={
+                  <ChartBarIcon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
+                }
+                value={stats.accuracy}
+                label="Accuracy"
+                unit="%"
+              />
             </div>
 
-            <div className="text-2xl leading-relaxed text-center font-mono text-slate-800 p-6 bg-white rounded-xl shadow-sm border border-slate-200">
-              {sentence.split('').map((char, index) => {
+            <div className="sm:text-xl md:text-xl lg:text-2xl xl:text-3xl leading-relaxed text-center font-mono text-slate-800 p-6 bg-white rounded-xl shadow-sm border border-slate-200">
+              {sentence.split("").map((char, index) => {
                 const inputChar = input[index];
                 return (
                   <span
                     key={index}
                     className={`
-                      ${inputChar 
-                        ? inputChar === char 
-                          ? 'text-emerald-500' 
-                          : 'text-rose-500 underline'
-                        : 'text-slate-400'}
-                      ${index === input.length ? 'border-b-4 border-blue-500' : ''}
+                      ${
+                        inputChar
+                          ? inputChar === char
+                            ? "text-emerald-500"
+                            : "text-rose-500 underline"
+                          : "text-slate-400"
+                      }
+                      ${
+                        index === input.length
+                          ? "border-b-4 border-blue-500"
+                          : ""
+                      }
                       transition-colors duration-75
                     `}
                   >
@@ -153,30 +188,40 @@ export default function ProfessionalTypingLab() {
           </div>
         )}
 
-        {gameState === 'results' && (
+        {gameState === "results" && (
           <div className="text-center animate-slide-up">
-            <h2 className="text-3xl font-semibold text-slate-800 mb-8">Session Analytics</h2>
+            <h2 className="text-3xl font-semibold text-slate-800 mb-8">
+              Session Analytics
+            </h2>
             <div className="grid grid-cols-2 gap-4 mb-8">
-              <StatPanel value={stats.wpm} label="Words/Min" icon={<BoltIcon className="w-8 h-8" />} color="text-blue-500" />
-              <StatPanel value={stats.accuracy} label="Accuracy" icon={<ChartBarIcon className="w-8 h-8" />} color="text-emerald-500" unit="%" />
-             
+              <StatPanel
+                value={stats.wpm}
+                label="Words/Min"
+                icon={<BoltIcon className="w-8 h-8" />}
+                color="text-blue-500"
+              />
+              <StatPanel
+                value={stats.accuracy}
+                label="Accuracy"
+                icon={<ChartBarIcon className="w-8 h-8" />}
+                color="text-emerald-500"
+                unit="%"
+              />
             </div>
             <div className="flex gap-4 justify-center">
-            <ActionButton 
-  onClick={() => {}} 
-  icon={<HomeModernIcon className="w-5 h-5" />} 
-  variant="secondary"
->
-  <Link href="/pro">
-    Leaderboard
-  </Link>
-</ActionButton>
+              <ActionButton
+                onClick={() => {}}
+                icon={<HomeModernIcon className="w-5 h-5" />}
+                variant="secondary"
+              >
+                <Link href="/pro">Leaderboard</Link>
+              </ActionButton>
             </div>
           </div>
         )}
       </div>
 
-      {showVirtual && gameState === 'playing' && (
+      {showVirtual && gameState === "playing" && (
         <MobileKeyboard
           onKeyPress={handleVirtualInput}
           currentSentence={sentence}
@@ -187,58 +232,59 @@ export default function ProfessionalTypingLab() {
   );
 }
 
-const MobileKeyboard = ({ 
-  onKeyPress,
-  currentSentence,
-  currentIndex
-}) => {
+const MobileKeyboard = ({ onKeyPress, currentSentence, currentIndex }) => {
   const rows = [
-    ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
-    ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
-    ['z', 'x', 'c', 'v', 'b', 'n', 'm'],
-    [' ']
+    ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
+    ["a", "s", "d", "f", "g", "h", "j", "k", "l"],
+    ["z", "x", "c", "v", "b", "n", "m"],
+    [" "],
   ];
 
-  const getNextChar = () => currentSentence[currentIndex]?.toLowerCase() || '';
+  const MobileKeyboard = ({ onKeyPress }) => {
+    const rows = [
+      ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
+      ["a", "s", "d", "f", "g", "h", "j", "k", "l"],
+      ["z", "x", "c", "v", "b", "n", "m"],
+    ];
 
-  return (
-    <div className="fixed inset-x-0 bottom-0 bg-white border-t border-slate-200 safe-area-pb">
-      <div className="p-2 space-y-1">
-        {rows.map((row, i) => (
-          <div key={i} className="flex justify-center gap-1">
-            {row.map((key) => {
-              const isNext = key === getNextChar();
-              const isSpace = key === ' ';
-              return (
+    return (
+      <div className="fixed inset-x-0 bottom-0 bg-white border-t border-slate-200 shadow-xl pt-2 pb-[env(safe-area-inset-bottom)] px-1">
+        <div className="max-w-lg mx-auto">
+          {rows.map((row, i) => (
+            <div key={i} className="flex justify-center gap-1 mb-1 px-1">
+              {row.map((key) => (
                 <button
                   key={key}
                   onClick={() => onKeyPress(key)}
-                  className={`${isSpace ? 'w-64' : 'w-10 h-14'} ${
-                    isNext ? 'bg-blue-500 text-white' : 'bg-slate-100 text-slate-600'
-                  } flex items-center justify-center rounded font-medium active:scale-95 transition-all duration-75 ${
-                    !isSpace && 'shadow-sm'
-                  }`}
+                  className="flex-1 h-12 min-w-[9%] bg-slate-100 text-slate-600 text-sm rounded-sm active:scale-95 transition-transform font-medium"
                 >
-                  {isSpace ? 'Space' : key}
+                  {key}
                 </button>
-              )}
-            )}
+              ))}
+            </div>
+          ))}
+
+          <div className="flex gap-1 px-1 mt-2">
+            <button
+              onClick={() => onKeyPress(" ")}
+              className="flex-[2] h-12 bg-slate-100 text-slate-600 text-sm rounded-sm active:scale-95 transition-transform"
+            >
+              Space
+            </button>
+            <button
+              onClick={() => onKeyPress("⌫")}
+              className="flex-1 h-12 bg-rose-100 text-rose-600 text-sm rounded-sm active:scale-95 transition-transform"
+            >
+              ⌫
+            </button>
           </div>
-        ))}
-        <div className="flex justify-center gap-1">
-          <button
-            onClick={() => onKeyPress('⌫')}
-            className="w-24 h-14 bg-rose-500 text-white flex items-center justify-center rounded active:scale-95"
-          >
-            ⌫ Delete
-          </button>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 };
 
-const MetricCard = ({ icon, value, label, unit = '' }) => (
+const MetricCard = ({ icon, value, label, unit = "" }) => (
   <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-xs">
     <div className="flex items-center gap-2 text-slate-500 mb-2">
       {icon}
@@ -251,7 +297,7 @@ const MetricCard = ({ icon, value, label, unit = '' }) => (
   </div>
 );
 
-const StatPanel = ({ value, label, icon, color, unit = '' }) => (
+const StatPanel = ({ value, label, icon, color, unit = "" }) => (
   <div className="bg-white p-6 rounded-xl border border-slate-200">
     <div className={`${color} mb-4`}>{icon}</div>
     <div className="text-4xl font-bold text-slate-800 mb-1">
@@ -262,18 +308,13 @@ const StatPanel = ({ value, label, icon, color, unit = '' }) => (
   </div>
 );
 
-const ActionButton = ({ 
-  children, 
-  onClick, 
-  icon, 
-  variant = 'primary' 
-}) => (
+const ActionButton = ({ children, onClick, icon, variant = "primary" }) => (
   <button
     onClick={onClick}
     className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all ${
-      variant === 'primary' 
-        ? 'bg-blue-500 text-white hover:bg-blue-600' 
-        : 'bg-white text-slate-600 border border-slate-300 hover:bg-slate-50'
+      variant === "primary"
+        ? "bg-blue-500 text-white hover:bg-blue-600"
+        : "bg-white text-slate-600 border border-slate-300 hover:bg-slate-50"
     }`}
   >
     {icon}

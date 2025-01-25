@@ -1,14 +1,14 @@
-'use client';
-import { useState, useRef, useEffect } from 'react';
-import Link from 'next/link';
-import { RocketLaunchIcon, ChartBarIcon, SpeakerWaveIcon, SpeakerXMarkIcon,  } from '@heroicons/react/24/outline';
+"use client";
+import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
+import {
+  RocketLaunchIcon,
+  ChartBarIcon,
+  SpeakerWaveIcon,
+  SpeakerXMarkIcon,
+} from "@heroicons/react/24/outline";
 
-const musicTracks = [
-  "/song1.mp3",
-  "/song2.mp3",
-  "/song3.mp3",
-];
-
+const musicTracks = ["/song3.mp3", "/song1.mp3", "/song2.mp3"];
 
 export default function NavBar() {
   const [audioState, setAudioState] = useState({
@@ -21,51 +21,43 @@ export default function NavBar() {
   const progressRef = useRef(null);
 
   const togglePlayback = () => {
-    if (!audioRef.current) return;
-  
-    // Mobile browsers require user interaction for audio
-    if (typeof audioRef.current.play === 'function') {
-      if (audioState.isPlaying) {
-        audioRef.current.pause();
-      } else {
-        // Reset audio for mobile compatibility
-        audioRef.current.currentTime = 0;
-        audioRef.current.play().catch((error) => {
-          console.log('Audio play failed:', error);
-        });
-      }
-      setAudioState(prev => ({ ...prev, isPlaying: !prev.isPlaying }));
+    if (audioState.isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play();
     }
+    setAudioState((prev) => ({ ...prev, isPlaying: !prev.isPlaying }));
   };
 
   const handleVolume = (e) => {
     const volume = parseFloat(e.target.value);
     audioRef.current.volume = volume;
-    setAudioState(prev => ({ ...prev, volume }));
+    setAudioState((prev) => ({ ...prev, volume }));
   };
 
   const updateProgress = () => {
-    const progress = (audioRef.current.currentTime / audioRef.current.duration) * 100;
-    setAudioState(prev => ({ ...prev, progress }));
+    const progress =
+      (audioRef.current.currentTime / audioRef.current.duration) * 100;
+    setAudioState((prev) => ({ ...prev, progress }));
   };
 
   const changeTrack = (index) => {
     audioRef.current.src = musicTracks[index];
     audioRef.current.play();
-    setAudioState(prev => ({
+    setAudioState((prev) => ({
       ...prev,
       currentTrack: index,
       isPlaying: true,
-      progress: 0
+      progress: 0,
     }));
   };
 
   useEffect(() => {
     audioRef.current.volume = audioState.volume;
-    audioRef.current.addEventListener('timeupdate', updateProgress);
-    
+    audioRef.current.addEventListener("timeupdate", updateProgress);
+
     return () => {
-      audioRef.current?.removeEventListener('timeupdate', updateProgress);
+      audioRef.current?.removeEventListener("timeupdate", updateProgress);
     };
   }, []);
 
@@ -76,31 +68,33 @@ export default function NavBar() {
           <RocketLaunchIcon className="w-6 h-6 text-emerald-400 group-hover:text-white" />
         </div>
         <span className="text-xl font-bold text-slate-200 group-hover:text-emerald-400 transition-colors">
-        TypingBoi
+          TypingBoi
         </span>
       </Link>
 
       <div className="flex items-center space-x-6">
-        <Link href="/pro" className="flex items-center space-x-2 text-slate-300 hover:text-emerald-400 transition-colors">
+        <Link
+          href="/pro"
+          className="flex items-center space-x-2 text-slate-300 hover:text-emerald-400 transition-colors"
+        >
           <ChartBarIcon className="w-5 h-5" />
           <span className="font-medium">Leaderboard</span>
         </Link>
 
         <div className="flex items-center space-x-4 pl-4 border-l border-slate-600">
-        <div className="relative group">
-  <button
-    onClick={togglePlayback}
-    className="p-2 rounded-lg bg-slate-700 hover:bg-emerald-500 transition-all"
-    aria-label={audioState.isPlaying ? "Pause music" : "Play music"}
-  >
-    {audioState.isPlaying ? (
-      <SpeakerWaveIcon className="w-5 h-5 text-emerald-400 group-hover:text-white" />
-    ) : (
-      <SpeakerXMarkIcon className="w-5 h-5 text-slate-400 group-hover:text-white" />
-    )}
-  </button>
+          <div className="relative group">
+            <button
+              onClick={togglePlayback}
+              className="p-2 rounded-lg bg-slate-700 hover:bg-emerald-500 transition-all"
+            >
+              {audioState.isPlaying ? (
+                <SpeakerWaveIcon className="w-6 h-6 text-emerald-400 group-hover:text-white" />
+              ) : (
+                <SpeakerXMarkIcon className="w-6 h-6 text-slate-400 group-hover:text-white" />
+              )}
+            </button>
 
-  <div className="hidden md:block absolute right-0 bottom-14 bg-slate-700 p-4 rounded-xl shadow-2xl w-64 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute right-0 bottom-14 bg-slate-700 p-4 rounded-xl shadow-2xl w-64 opacity-0 group-hover:opacity-100 transition-opacity">
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
                   <input
@@ -118,11 +112,11 @@ export default function NavBar() {
                 </div>
 
                 <div className="relative pt-1">
-                  <div 
+                  <div
                     ref={progressRef}
                     className="h-1 bg-slate-600 rounded-full overflow-hidden"
                   >
-                    <div 
+                    <div
                       className="h-full bg-emerald-500 transition-all"
                       style={{ width: `${audioState.progress}%` }}
                     />
@@ -136,8 +130,8 @@ export default function NavBar() {
                       onClick={() => changeTrack(index)}
                       className={`p-2 rounded-lg text-sm ${
                         audioState.currentTrack === index
-                          ? 'bg-emerald-500 text-white'
-                          : 'bg-slate-600 hover:bg-slate-500 text-slate-300'
+                          ? "bg-emerald-500 text-white"
+                          : "bg-slate-600 hover:bg-slate-500 text-slate-300"
                       }`}
                     >
                       Track #{index + 1}
@@ -150,8 +144,8 @@ export default function NavBar() {
         </div>
       </div>
 
-      <audio 
-        ref={audioRef} 
+      <audio
+        ref={audioRef}
         src={musicTracks[audioState.currentTrack]}
         loop={false}
       />
