@@ -180,7 +180,7 @@ export default function ProfessionalTypingLab() {
         <MobileKeyboard
           onKeyPress={handleVirtualInput}
           currentSentence={sentence}
-          currentIndex={currentIndex}
+          currentIndex={input.length}
         />
       )}
     </div>
