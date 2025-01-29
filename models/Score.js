@@ -1,3 +1,4 @@
+// First, let's create the MongoDB model (models/Score.js)
 import mongoose from 'mongoose';
 
 const ScoreSchema = new mongoose.Schema({
@@ -19,11 +20,6 @@ const ScoreSchema = new mongoose.Schema({
   rawWpm: {
     type: Number,
     required: true
-  },
-  submissionId: {
-    type: String,
-    required: true,
-    unique: true  // Add unique constraint
   },
   createdAt: {
     type: Date,

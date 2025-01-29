@@ -7,33 +7,30 @@ import {
   HomeModernIcon,
   ArrowPathIcon,
   CurrencyDollarIcon,
-  TrophyIcon,
 } from "@heroicons/react/24/outline";
 
 const sentences = [
-  "in the world of coding skill grows not from random moments but from steady and focused work that turns new programmers into masters who link ideas with clear steps using their time and energy wisely to solve hard problems and build systems that stand the test of time",
-  "in the deep systems of tech typing speed is more than just input it becomes a sign of clear and strong thought where each press turns complex and abstract ideas into real results bridging the gap between imagination and working code that shapes the digital world",
-  "clear and simple code is like the glue of smooth and productive work where every small and careful line changes messy and scattered ideas into neat and organized ones speeding up progress with fixes that are smart quick and precise creating tools that make life easier",
-  "typing well is like a skill where hands move fast and true turning thoughts into code that pushes what humans can do with tech even further allowing ideas to flow freely and opening the door to new possibilities that were once beyond reach",
-  "good habits in typing cut down strain by making work smooth and easy while turning tough and tiring tasks into simple and clear flows letting people create more stay focused and work longer without feeling the heavy toll of fatigue and stress"
+  "In the world of coding, skill grows not from random moments but from steady and focused work that turns new programmers into masters who link ideas with clear steps, using their time and energy wisely to solve hard problems and build systems that stand the test of time.",
+  "In the deep systems of tech, typing speed is more than just input; it becomes a sign of clear and strong thought where each press turns complex and abstract ideas into real results, bridging the gap between imagination and working code that shapes the digital world.",
+  "Clear and simple code is like the glue of smooth and productive work where every small and careful line changes messy and scattered ideas into neat and organized ones, speeding up progress with fixes that are smart, quick, and precise, creating tools that make life easier.",
+  "Typing well is like a skill where hands move fast and true, turning thoughts into code that pushes what humans can do with tech even further, allowing ideas to flow freely and opening the door to new possibilities that were once beyond reach.",
+  "Good habits in typing cut down strain by making work smooth and easy while turning tough and tiring tasks into simple and clear flows, letting people create more, stay focused, and work longer without feeling the heavy toll of fatigue and stress.",
 ];
 
 export default function ProfessionalTypingLab() {
   const [input, setInput] = useState("");
   const [sentence, setSentence] = useState("");
-  const hasSubmittedRef = useRef(false);
-  const [stats, setStats] = useState({
-    wpm: 0,
-    accuracy: 100,
+  const hasSubmittedRef = useRef(false); 
+  const [stats, setStats] = useState({ 
+    wpm: 0, 
+    accuracy: 100, 
     time: 30,
-    rawWpm: 0,
+    rawWpm: 0 
   });
   const [gameState, setGameState] = useState("username");
   const [isMobile, setIsMobile] = useState(false);
   const [username, setUsername] = useState("");
   const [submitError, setSubmitError] = useState("");
-  const [showLeaderboard, setShowLeaderboard] = useState(false);
-  const [leaderboardData, setLeaderboardData] = useState([]);
   
   const inputRef = useRef(null);
   const timerRef = useRef(null);
@@ -52,16 +49,6 @@ export default function ProfessionalTypingLab() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  const fetchLeaderboard = async () => {
-    try {
-      const response = await fetch('/api/scores');
-      const data = await response.json();
-      setLeaderboardData(data);
-    } catch (error) {
-      console.error('Leaderboard fetch error:', error);
-    }
-  };
-
   const generateSentence = useCallback(() => {
     const crypto = window.crypto || window.msCrypto;
     const values = new Uint32Array(1);
@@ -72,29 +59,34 @@ export default function ProfessionalTypingLab() {
   const startGame = useCallback(() => {
     totalCharsTypedRef.current = 0;
     correctCharsRef.current = 0;
+    hasSubmittedRef.current = false; // Reset submission status
     const newSentence = generateSentence();
     setSentence(newSentence);
     setInput("");
     setGameState("playing");
-    setShowLeaderboard(false);
     setStats({ wpm: 0, accuracy: 100, time: 30, rawWpm: 0 });
     timerStartedRef.current = false;
     startTimeRef.current = null;
-    hasSubmittedRef.current = false;
     if (timerRef.current) clearInterval(timerRef.current);
   }, [generateSentence]);
-
+  
+  // Update the endGame function with submission guard
   const endGame = useCallback(async () => {
+    // Prevent multiple submissions
     if (hasSubmittedRef.current) {
       return;
     }
-  
+    
+    // Set submission flag immediately
     hasSubmittedRef.current = true;
     
+    // Clear timer
     if (timerRef.current) {
       clearInterval(timerRef.current);
+      timerRef.current = null;
     }
     
+    // Final calculations
     const timeElapsed = (Date.now() - startTimeRef.current) / 1000;
     const finalWpm = Math.round((correctCharsRef.current / 5) / (timeElapsed / 60));
     const finalAccuracy = totalCharsTypedRef.current > 0
@@ -110,21 +102,16 @@ export default function ProfessionalTypingLab() {
       time: 0
     }));
   
-    setGameState("results");
-  
     try {
-      const submissionData = {
-        name: username.trim(),
-        wpm: finalWpm,
-        accuracy: finalAccuracy,
-        rawWpm: finalRawWpm,
-        timestamp: Date.now()
-      };
-  
       const response = await fetch('/api/scores', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(submissionData)
+        body: JSON.stringify({
+          name: username.trim(),
+          wpm: finalWpm,
+          accuracy: finalAccuracy,
+          rawWpm: finalRawWpm
+        }),
       });
   
       const data = await response.json();
@@ -134,29 +121,30 @@ export default function ProfessionalTypingLab() {
       }
       
       setSubmitError('');
-      await fetchLeaderboard();
     } catch (error) {
       console.error('Save Error:', error);
       setSubmitError(error.message);
     }
+  
+    setGameState("results");
   }, [username]);
 
-  const startTimer = useCallback(() => {
-    if (!timerStartedRef.current) {
-      timerStartedRef.current = true;
-      startTimeRef.current = Date.now();
-  
-      timerRef.current = setInterval(() => {
-        setStats((prev) => {
-          if (prev.time <= 1 && !hasSubmittedRef.current) {
-            endGame();
-            return { ...prev, time: 0 };
-          }
-          return { ...prev, time: prev.time - 1 };
-        });
-      }, 1000);
-    }
-  }, [endGame]);
+const startTimer = useCallback(() => {
+  if (!timerStartedRef.current) {
+    timerStartedRef.current = true;
+    startTimeRef.current = Date.now();
+
+    timerRef.current = setInterval(() => {
+      setStats((prev) => {
+        if (prev.time <= 1 && !hasSubmittedRef.current) {
+          endGame();
+          return { ...prev, time: 0 };
+        }
+        return { ...prev, time: prev.time - 1 };
+      });
+    }, 1000);
+  }
+}, [endGame]);
 
   const processInput = useCallback(
     (newInput) => {
@@ -224,41 +212,26 @@ export default function ProfessionalTypingLab() {
 
   const handleUsernameSubmit = (e) => {
     e.preventDefault();
-    if (username.trim().length < 2 || username.trim().length > 8) {
-      setSubmitError('Please enter a name between 2-8 characters');
+    if (username.trim().length < 2) {
+      setSubmitError('Please enter a name with at least 2 characters');
       return;
     }
     startGame();
   };
 
-  const toggleLeaderboard = () => {
-    setShowLeaderboard(prev => !prev);
-    if (!showLeaderboard) {
-      fetchLeaderboard();
-    }
-  };
-
-
   return (
     <div className="min-h-screen bg-slate-50 font-geist relative pb-[300px]">
       <div className="max-w-4xl mx-auto px-4 py-8">
-        {/* Header with username after login */}
-        {gameState !== "username" && (
-          <div className="text-right mb-4">
-            <span className="text-slate-600">Hey, <span className="font-semibold text-slate-800">{username}</span>!</span>
-          </div>
-        )}
-
         {gameState === "username" && (
           <div className="text-center animate-fade-in">
             <h1 className="text-3xl font-semibold text-slate-800 mb-8">
-              Boi Typing Env.
+              Professional Typing Lab
             </h1>
             
             <form onSubmit={handleUsernameSubmit} className="max-w-sm mx-auto">
               <div className="mb-4">
                 <label className="block text-sm text-slate-600 mb-2">
-                  Enter your name to begin (2-8 characters)
+                  Enter your name to begin
                 </label>
                 <input
                   type="text"
@@ -269,7 +242,7 @@ export default function ProfessionalTypingLab() {
                   }}
                   className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Type your name"
-                  maxLength="8"
+                  maxLength="20"
                   autoFocus
                 />
                 {submitError && (
@@ -352,56 +325,27 @@ export default function ProfessionalTypingLab() {
             <h2 className="text-3xl font-semibold text-slate-800 mb-8">
               Session Results
             </h2>
-            
-            {showLeaderboard ? (
-              <div className="mb-8">
-                <h3 className="text-xl font-semibold mb-4">Leaderboard</h3>
-                <div className="bg-white rounded-xl border border-slate-200 p-4">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="text-left text-slate-600">
-                        <th className="p-2">Rank</th>
-                        <th className="p-2">Name</th>
-                        <th className="p-2">WPM</th>
-                        <th className="p-2">Accuracy</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {leaderboardData.map((score, index) => (
-                        <tr key={index} className="border-t border-slate-100">
-                          <td className="p-2">{index + 1}</td>
-                          <td className="p-2">{score.name}</td>
-                          <td className="p-2">{score.wpm}</td>
-                          <td className="p-2">{score.accuracy}%</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 gap-4 mb-8">
-                <StatPanel
-                  value={stats.wpm}
-                  label="Net WPM"
-                  icon={<BoltIcon className="w-8 h-8" />}
-                  color="text-blue-500"
-                />
-                <StatPanel
-                  value={stats.rawWpm}
-                  label="Raw WPM"
-                  icon={<HomeModernIcon className="w-8 h-8" />}
-                  color="text-purple-500"
-                />
-                <StatPanel
-                  value={stats.accuracy}
-                  label="Accuracy"
-                  icon={<ChartBarIcon className="w-8 h-8" />}
-                  color="text-emerald-500"
-                  unit="%"
-                />
-              </div>
-            )}
+            <div className="grid grid-cols-2 gap-4 mb-8">
+              <StatPanel
+                value={stats.wpm}
+                label="Net WPM"
+                icon={<BoltIcon className="w-8 h-8" />}
+                color="text-blue-500"
+              />
+              <StatPanel
+                value={stats.rawWpm}
+                label="Raw WPM"
+                icon={<HomeModernIcon className="w-8 h-8" />}
+                color="text-purple-500"
+              />
+              <StatPanel
+                value={stats.accuracy}
+                label="Accuracy"
+                icon={<ChartBarIcon className="w-8 h-8" />}
+                color="text-emerald-500"
+                unit="%"
+              />
+            </div>
             
             {submitError && (
               <p className="text-rose-500 text-sm mb-4">{submitError}</p>
@@ -413,14 +357,7 @@ export default function ProfessionalTypingLab() {
                 icon={<ArrowPathIcon className="w-5 h-5" />}
                 variant="primary"
               >
-                Next Test
-              </ActionButton>
-              <ActionButton
-                onClick={toggleLeaderboard}
-                icon={<TrophyIcon className="w-5 h-5" />}
-                variant="secondary"
-              >
-                {showLeaderboard ? 'Show Results' : 'Leaderboard'}
+                Try Again
               </ActionButton>
             </div>
           </div>
