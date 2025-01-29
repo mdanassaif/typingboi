@@ -1,0 +1,7 @@
+export const sentences = [
+    "in the world of coding skill grows not from random moments but from steady and focused work that turns new programmers into masters who link ideas with clear steps using their time and energy wisely to solve hard problems and build systems that stand the test of time",
+    "in the deep systems of tech typing speed is more than just input it becomes a sign of clear and strong thought where each press turns complex and abstract ideas into real results bridging the gap between imagination and working code that shapes the digital world",
+    "clear and simple code is like the glue of smooth and productive work where every small and careful line changes messy and scattered ideas into neat and organized ones speeding up progress with fixes that are smart quick and precise creating tools that make life easier",
+    "typing well is like a skill where hands move fast and true turning thoughts into code that pushes what humans can do with tech even further allowing ideas to flow freely and opening the door to new possibilities that were once beyond reach",
+    "good habits in typing cut down strain by making work smooth and easy while turning tough and tiring tasks into simple and clear flows letting people create more stay focused and work longer without feeling the heavy toll of fatigue and stress"
+  ];
