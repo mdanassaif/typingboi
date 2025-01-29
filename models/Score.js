@@ -5,21 +5,27 @@ const ScoreSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-    maxlength: 50
+    minlength: 2,
+    maxlength: 20
   },
   wpm: {
     type: Number,
-    required: true,
-    min: 0,
-    max: 500
+    required: true
   },
   accuracy: {
     type: Number,
-    required: true,
-    min: 0,
-    max: 100
+    required: true
   },
-  timestamp: {
+  rawWpm: {
+    type: Number,
+    required: true
+  },
+  submissionId: {
+    type: String,
+    required: true,
+    unique: true  // Add unique constraint
+  },
+  createdAt: {
     type: Date,
     default: Date.now
   }

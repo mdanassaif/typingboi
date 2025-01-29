@@ -1,24 +1,17 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import {
-  RocketLaunchIcon,
-  ChartBarIcon,
-  SpeakerWaveIcon,
-  SpeakerXMarkIcon,
-} from "@heroicons/react/24/outline";
+import { ChartBarIcon, SpeakerWaveIcon, SpeakerXMarkIcon } from "@heroicons/react/24/outline";
 
-const musicTracks = ["/song3.mp3", "/song1.mp3", "/song2.mp3"];
+const musicTracks = ["/song1.mp3", "/song2.mp3", "/song3.mp3"];
 
 export default function NavBar() {
   const [audioState, setAudioState] = useState({
     isPlaying: false,
     currentTrack: 0,
     volume: 0.5,
-    progress: 0,
   });
   const audioRef = useRef(null);
-  const progressRef = useRef(null);
 
   const togglePlayback = () => {
     if (audioState.isPlaying) {
@@ -35,12 +28,6 @@ export default function NavBar() {
     setAudioState((prev) => ({ ...prev, volume }));
   };
 
-  const updateProgress = () => {
-    const progress =
-      (audioRef.current.currentTime / audioRef.current.duration) * 100;
-    setAudioState((prev) => ({ ...prev, progress }));
-  };
-
   const changeTrack = (index) => {
     audioRef.current.src = musicTracks[index];
     audioRef.current.play();
@@ -48,29 +35,18 @@ export default function NavBar() {
       ...prev,
       currentTrack: index,
       isPlaying: true,
-      progress: 0,
     }));
   };
 
   useEffect(() => {
     audioRef.current.volume = audioState.volume;
-    audioRef.current.addEventListener("timeupdate", updateProgress);
-
-    return () => {
-      audioRef.current?.removeEventListener("timeupdate", updateProgress);
-    };
   }, []);
 
   return (
     <nav className="sticky top-0 z-50 bg-slate-800/90 backdrop-blur-sm flex justify-between items-center p-4 shadow-xl">
-      <Link href="/" className="flex items-center space-x-3 group">
-        <div className="p-2 bg-slate-700 rounded-lg group-hover:bg-emerald-500 transition-all">
-          <RocketLaunchIcon className="w-6 h-6 text-emerald-400 group-hover:text-white" />
-        </div>
-        <span className="text-xl font-bold text-slate-200 group-hover:text-emerald-400 transition-colors">
-          TypingBoi
-        </span>
-      </Link>
+      <span className="text-xl font-bold text-slate-200">
+        TypingBoi
+      </span>
 
       <div className="flex items-center space-x-6">
         <Link
@@ -109,18 +85,6 @@ export default function NavBar() {
                   <span className="text-sm text-slate-300">
                     {Math.round(audioState.volume * 100)}%
                   </span>
-                </div>
-
-                <div className="relative pt-1">
-                  <div
-                    ref={progressRef}
-                    className="h-1 bg-slate-600 rounded-full overflow-hidden"
-                  >
-                    <div
-                      className="h-full bg-emerald-500 transition-all"
-                      style={{ width: `${audioState.progress}%` }}
-                    />
-                  </div>
                 </div>
 
                 <div className="grid grid-cols-3 gap-2">
