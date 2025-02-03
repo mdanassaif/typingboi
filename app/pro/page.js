@@ -37,7 +37,7 @@ export default function LeaderboardPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500"></div>
       </div>
     );
   }
@@ -64,7 +64,7 @@ export default function LeaderboardPage() {
           
           <button
             onClick={handleStartNewTest}
-            className="mt-4 sm:mt-6 inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium text-sm sm:text-base"
+            className="mt-4 sm:mt-6 inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors font-medium text-sm sm:text-base"
           >
             <ArrowPathIcon className="w-4 h-4 sm:w-5 sm:h-5" />
             Take Another Test

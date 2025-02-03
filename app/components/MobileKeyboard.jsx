@@ -1,57 +1,63 @@
-export const MobileKeyboard = ({ onKeyPress, currentSentence, currentIndex }) => {
-    const rows = [
-      ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
-      ["a", "s", "d", "f", "g", "h", "j", "k", "l"],
-      ["z", "x", "c", "v", "b", "n", "m"],
-    ];
-  
-    return (
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-lg border-t border-slate-700 pb-safe">
-        <div className="max-w-lg mx-auto px-2 py-4">
-          {rows.map((row, i) => (
-            <div 
-              key={i} 
-              className={`flex justify-center gap-1.5 mb-1.5 ${
-                i === 1 ? 'px-4' : i === 2 ? 'px-8' : ''
-              }`}
-            >
-              {row.map((key) => (
-                <button
-                  key={key}
-                  onClick={() => onKeyPress(key)}
-                  className="
-                    aspect-square h-12 min-w-[8%] rounded-lg font-medium text-base
-                    transition-all duration-200 active:scale-95
-                    bg-slate-800/80 text-slate-200 hover:bg-slate-700
-                    border border-slate-700/50
-                    backdrop-blur-sm
-                  "
-                >
-                  {key}
-                </button>
-              ))}
-            </div>
-          ))}
-  
-          <div className="flex gap-1.5 mt-2">
-            <button
-              onClick={() => onKeyPress("⌫")}
-              className="w-[15%] h-12 bg-slate-800/80 text-slate-200 rounded-lg font-medium 
-                       transition-all active:scale-95 border border-slate-700/50
-                       hover:bg-slate-700"
-            >
-              ⌫
-            </button>
-            <button
-              onClick={() => onKeyPress(" ")}
-              className="flex-1 h-12 bg-slate-800/80 text-slate-200 rounded-lg font-medium 
-                       transition-all active:scale-95 border border-slate-700/50
-                       hover:bg-slate-700"
-            >
-              space
-            </button>
-          </div>
+export const MobileKeyboard = ({ onKeyPress }) => {
+  const keys = [
+    ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+    ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+    ['z', 'x', 'c', 'v', 'b', 'n', 'm', '⌫'],
+    [' '] // Space bar
+  ];
+
+  return (
+    <div className="w-full max-w-3xl mx-auto select-none">
+      {keys.map((row, rowIndex) => (
+        <div 
+          key={rowIndex} 
+          className="flex justify-center gap-1.5 mb-1.5"
+          style={{ paddingLeft: rowIndex * 12 + 'px' }}
+        >
+          {row.map((key) => {
+            const isSpace = key === ' ';
+            const isBackspace = key === '⌫';
+            
+            return (
+              <button
+                key={key}
+                onClick={() => onKeyPress(key)}
+                className={`
+                  ${isSpace ? 'w-48' : 'w-10'} 
+                  h-12
+                  rounded-xl
+                  font-medium
+                  transition-all
+                  duration-150
+                  active:scale-95
+                  relative
+                  overflow-hidden
+                  ${isBackspace 
+                    ? 'bg-gradient-to-br from-rose-500 to-rose-600 text-white' 
+                    : isSpace
+                    ? 'bg-gradient-to-br from-slate-100 to-slate-200 text-slate-600'
+                    : 'bg-gradient-to-br from-white to-slate-100 text-slate-700'}
+                  shadow-lg
+                  hover:shadow-xl
+                  hover:-translate-y-0.5
+                  active:shadow-md
+                  after:absolute
+                  after:inset-0
+                  after:bg-white/20
+                  after:opacity-0
+                  hover:after:opacity-100
+                  after:transition-opacity
+                  border border-slate-200/50
+                `}
+              >
+                <span className="relative z-10 uppercase text-sm">
+                  {key === ' ' ? 'space' : key}
+                </span>
+              </button>
+            );
+          })}
         </div>
-      </div>
-    );
-  };
+      ))}
+    </div>
+  );
+};
