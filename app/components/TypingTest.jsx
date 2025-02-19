@@ -5,7 +5,7 @@ import {
   BoltIcon,
   ChartBarIcon,
   ArrowPathIcon,
-  CommandLineIcon,
+  UserPlusIcon,
 } from "@heroicons/react/24/outline";
 import { sentences } from "../constants/sentences";
 import { MobileKeyboard } from './MobileKeyboard';
@@ -316,9 +316,9 @@ export default function ProfessionalTypingLab() {
           <div className="text-center animate-fade-in min-h-[80vh] flex items-center justify-center">
             <div className={`${theme === 'dark' ? 'bg-slate-800/90' : 'bg-white/90'} backdrop-blur-lg rounded-xl p-10 max-w-md w-full mx-auto border border-slate-700/20 shadow-xl`}>
               <div className="flex items-center justify-center mb-8">
-                <CommandLineIcon className="w-10 h-10 text-emerald-500" />
+                <UserPlusIcon className="w-10 h-10 text-emerald-500" />
                 <h1 className={`text-3xl font-mono font-bold ${theme === 'dark' ? 'text-slate-200' : 'text-slate-800'} ml-3`}>
-                  monkey type
+                  Typing Boi
                 </h1>
               </div>
 
