@@ -177,7 +177,7 @@ export default function ProfessionalTypingLab() {
           name: username.trim(),
           wpm: finalWpm,
           accuracy: finalAccuracy,
-          rawWpm: finalWpm, // Include rawWpm in the request body
+          rawWpm: finalWpm,
         }),
       });
   
@@ -187,7 +187,7 @@ export default function ProfessionalTypingLab() {
         throw new Error(data.error || 'Score submission failed');
       }
   
-      console.log('Score saved successfully:', data); // Log the response
+      console.log('Score saved successfully:', data);
       setSubmitError('');
     } catch (error) {
       console.error('Save Error:', error);
@@ -201,13 +201,13 @@ export default function ProfessionalTypingLab() {
     if (!timerStartedRef.current) {
       timerStartedRef.current = true;
       startTimeRef.current = Date.now();
-
+  
       timerRef.current = setInterval(() => {
         setStats((prev) => {
           const newTime = prev.time - 1;
           if (newTime <= 0) {
             clearInterval(timerRef.current);
-            endGame();
+            endGame();  
             return { ...prev, time: 0 };
           }
           return { ...prev, time: newTime };
